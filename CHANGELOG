@@ -2,7 +2,13 @@
 Changelog
 =========
 
-2.0.0
+2.0.2
+-----
+
+- Update example in README.rst
+
+
+2.0.1
 -----
 
 - Python 3 support
@@ -11,6 +17,12 @@ Changelog
 - Fix bug(s) with handling requests library and errors from requests
 - Improved API by using exceptions instead of returning error codes
 - Switched to cryptography instead of M2Crypto
+
+
+2.0.0
+-----
+
+- Fork rfc3161
 
 
 1.0.7
