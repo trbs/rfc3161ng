@@ -2,6 +2,13 @@
 Changelog
 =========
 
+2.0.4
+-----
+
+- Add utility functions; make_timestamp_request, encode_timestamp_request,
+    encode_timestamp_response, decode_timestamp_request, decode_timestamp_response
+
+
 2.0.3
 -----
 

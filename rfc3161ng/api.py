@@ -16,7 +16,9 @@ import rfc3161ng
 
 __all__ = (
     'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
-    'TimestampingError', 'get_timestamp'
+    'TimestampingError', 'get_timestamp', 'make_timestamp_request',
+    'encode_timestamp_request', 'encode_timestamp_response',
+    'decode_timestamp_request', 'decode_timestamp_response',
 )
 
 id_attribute_messageDigest = univ.ObjectIdentifier((1, 2, 840, 113549, 1, 9, 4))
@@ -188,28 +190,18 @@ class RemoteTimestamper(object):
         )
 
     def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
-        algorithm_identifier = rfc2459.AlgorithmIdentifier()
-        algorithm_identifier.setComponentByPosition(0, get_hash_oid(self.hashname))
-        message_imprint = rfc3161ng.MessageImprint()
-        message_imprint.setComponentByPosition(0, algorithm_identifier)
-        hashobj = hashlib.new(self.hashname)
         if data:
-            if not isinstance(data, bytes):
-                data = data.encode()
-            hashobj.update(data)
-            digest = hashobj.digest()
-        elif digest:
-            assert len(digest) == hashobj.digest_size, 'digest length is wrong'
-        else:
-            raise ValueError('You must pass some data to digest, or the digest')
-        message_imprint.setComponentByPosition(1, digest)
-        request = rfc3161ng.TimeStampReq()
-        request.setComponentByPosition(0, 'v1')
-        request.setComponentByPosition(1, message_imprint)
-        if nonce is not None:
-            request.setComponentByPosition(3, int(nonce))
-        request.setComponentByPosition(4, include_tsa_certificate if include_tsa_certificate is not None else self.include_tsa_certificate)
-        binary_request = encoder.encode(request)
+            digest = data_to_digest(data, self.hashname)
+
+        request = make_timestamp_request(
+            data=data,
+            digest=digest,
+            hashname=self.hashname,
+            include_tsa_certificate=include_tsa_certificate if include_tsa_certificate is not None else self.include_tsa_certificate,
+            nonce=nonce,
+        )
+        binary_request = encode_timestamp_request(request)
+
         headers = {'Content-Type': 'application/timestamp-query'}
         if self.username is not None:
             username = self.username.encode() if not isinstance(self.username, bytes) else self.username
@@ -228,8 +220,58 @@ class RemoteTimestamper(object):
             response.raise_for_status()
         except requests.RequestException as exc:
             raise TimestampingError('Unable to send the request to %r' % self.url, exc)
-        tst_response, substrate = decoder.decode(response.content, asn1Spec=rfc3161ng.TimeStampResp())
-        if substrate:
-            raise ValueError('Extra data returned')
+        tst_response = decode_timestamp_response(response.content)
         self.check_response(tst_response, digest, nonce=nonce)
         return encoder.encode(tst_response.time_stamp_token)
+
+
+def data_to_digest(data, hashname='sha1'):
+    hashobj = hashlib.new(hashname)
+    if not isinstance(data, bytes):
+        data = data.encode()
+    hashobj.update(data)
+    return hashobj.digest()
+
+
+def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_certificate=False, nonce=None):
+    algorithm_identifier = rfc2459.AlgorithmIdentifier()
+    algorithm_identifier.setComponentByPosition(0, get_hash_oid(hashname))
+    message_imprint = rfc3161ng.MessageImprint()
+    message_imprint.setComponentByPosition(0, algorithm_identifier)
+    hashobj = hashlib.new(hashname)
+    if digest:
+        assert len(digest) == hashobj.digest_size, 'digest length is wrong %s != %s' % (len(digest), hashobj.digest_size)
+    elif data:
+        digest = data_to_digest(data)
+    else:
+        raise ValueError('You must pass some data to digest, or the digest')
+    message_imprint.setComponentByPosition(1, digest)
+    request = rfc3161ng.TimeStampReq()
+    request.setComponentByPosition(0, 'v1')
+    request.setComponentByPosition(1, message_imprint)
+    if nonce is not None:
+        request.setComponentByPosition(3, int(nonce))
+    request.setComponentByPosition(4, include_tsa_certificate)
+    return request
+
+
+def encode_timestamp_request(request):
+    return encoder.encode(request)
+
+
+def encode_timestamp_response(response):
+    return encoder.encode(response)
+
+
+def decode_timestamp_request(request):
+    tsr, substrate = decoder.decode(request, asn1Spec=rfc3161ng.TimeStampReq())
+    if substrate:
+        raise ValueError('Extra data returned')
+    return tsr
+
+
+def decode_timestamp_response(response):
+    tst_response, substrate = decoder.decode(response, asn1Spec=rfc3161ng.TimeStampResp())
+    if substrate:
+        raise ValueError('Extra data returned')
+    return tst_response

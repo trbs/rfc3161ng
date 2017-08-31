@@ -44,7 +44,7 @@ def test_teszt_e_szigno_hu():
         password='teszt',
         certificate=os.path.join(os.path.dirname(__file__), '../data/e_szigno_test_tsa2.crt'),
         data=data,
-        hashname='sha256'
+        hashname='sha256',
     )
 
 
@@ -57,5 +57,15 @@ def test_teszt_e_szigno_hu_with_nonce():
         certificate=os.path.join(os.path.dirname(__file__), '../data/e_szigno_test_tsa2.crt'),
         data=data,
         nonce=2,
-        hashname='sha256'
+        hashname='sha256',
     )
+
+
+def test_encode_decode_timestamp_request():
+    tsr = rfc3161ng.make_timestamp_request(data="test")
+    assert tsr.prettyPrint() == "TimeStampReq:\n version='v1'\n messageImprint=MessageImprint:\n  hashAlgorithm=AlgorithmIdentifier:\n   algorithm=1.3.14.3.2.26\n\n  hashedMessage=0xa94a8fe5ccb19ba61c4c0873d391e987982fbbd3\n\n certReq='False'\n"
+    bin_tsr = rfc3161ng.encode_timestamp_request(tsr)
+    assert bin_tsr == b'0$\x02\x01\x010\x1f0\x07\x06\x05+\x0e\x03\x02\x1a\x04\x14\xa9J\x8f\xe5\xcc\xb1\x9b\xa6\x1cL\x08s\xd3\x91\xe9\x87\x98/\xbb\xd3'
+    tsr2 = rfc3161ng.decode_timestamp_request(bin_tsr)
+    assert tsr2.getComponentByPosition(1).getComponentByPosition(1) == tsr.getComponentByPosition(1).getComponentByPosition(1)
+    # This test is probably still incomplete
