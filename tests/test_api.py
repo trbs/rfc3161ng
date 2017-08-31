@@ -53,7 +53,8 @@ def test_teszt_e_szigno_hu_with_nonce():
     data = '{"comment": "Envoi en Commission", "to": "Benjamin Dauvergne", "filetype": "Arr\u00eat CC", "from": "Benjamin Dauvergne", "files": [{"name": "affectations_ange1d.xlsx", "digest": "ce57e4ba353107dddaab91b9ad26c0569ffe0f94", "size": 16279}]}'
     default_test(
         'https://teszt.e-szigno.hu:440/tsa',
-        username='teszt', password='teszt',
+        username='teszt',
+        password='teszt',
         certificate=os.path.join(os.path.dirname(__file__), '../data/e_szigno_test_tsa2.crt'),
         data=data,
         nonce=2,
