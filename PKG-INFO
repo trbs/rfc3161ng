@@ -1,0 +1,41 @@
+Metadata-Version: 1.0
+Name: rfc3161
+Version: 1.0.7
+Summary: Python implementation of the RFC3161 specification, using pyasn1
+Home-page: https://dev.entrouvert.org/projects/python-rfc3161
+Author: Benjamin Dauvergne
+Author-email: bdauvergne@entrouvert.com
+License: MIT
+Description: rfc3161
+        =======
+        
+        A simple client library for cryptographic timestamping service implementing the
+        protocol from RFC3161.
+        
+            >>> import rfc3161
+            >>> certificate = file('data/certum_certificate.crt').read()
+            >>> rt = rfc3161.RemoteTimestamper('http://time.certum.pl', certificate=certificate)
+            >>> rt.timestamp(data='John Doe')
+            ('...', '')
+            >>> rt.check(_, data='John Doe')
+            (True, '')
+            >>> rfc3161.get_timestamp(tst)
+            datetime.datetime(2014, 4, 25, 9, 34, 16)
+        
+        Authors
+        =======
+        
+        Benjamin Dauvergne <bdauvergne@entrouvert.com>
+        Michael Gebetsroither <michael@mgeb.org>
+        
+        Changelog
+        =========
+        
+        1.0.7
+        -----
+        
+        - use dateutil to parse genTime
+        - fix bad instantiation of UTF8String in PKIFreeText
+        - use tox and py.test
+        
+Platform: UNKNOWN

@@ -1,0 +1,6 @@
+include tests/*.py
+include stdeb.cfg
+include tox.ini
+
+recursive-include data *.crt
+recursive-include spec *.asn88
