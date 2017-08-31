@@ -2,6 +2,21 @@
 rfc3161ng
 =========
 
+.. image:: https://img.shields.io/pypi/l/rfc3161ng.svg
+   :target: https://raw.githubusercontent.com/trbs/rfc3161ng/master/LICENSE
+
+.. image:: https://travis-ci.org/trbs/rfc3161ng.svg?branch=master
+    :alt: Build Status
+    :target: https://travis-ci.org/trbs/rfc3161ng
+
+.. image:: https://img.shields.io/pypi/v/rfc3161ng.svg
+    :target: https://pypi.python.org/pypi/rfc3161ng/
+    :alt: Latest PyPI version
+
+.. image:: https://img.shields.io/pypi/wheel/rfc3161ng.svg
+    :target: https://pypi.python.org/pypi/rfc3161ng/
+    :alt: Supports Wheel format
+
 A simple client library for cryptographic timestamping service implementing the
 protocol from RFC3161.
 
