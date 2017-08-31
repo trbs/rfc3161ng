@@ -37,14 +37,31 @@ Example
     >>> rfc3161.get_timestamp(tst)
     datetime.datetime(2014, 4, 25, 9, 34, 16)
 
+
+Install on MAC
+==============
+
+    # workaround to allow m2crypto to install on mac with homebrew
+    env LDFLAGS="-L$(brew --prefix openssl)/lib" CFLAGS="-I$(brew --prefix openssl)/include" SWIG_FEATURES="-cpperraswarn -includeall -I$(brew --prefix openssl)/include"
+
+
 Authors
 =======
 
 Benjamin Dauvergne <bdauvergne@entrouvert.com>
 Michael Gebetsroither <michael@mgeb.org>
+Bas van Oostveen <trbs@trbs.net>
+
 
 Changelog
 =========
+
+2.0.0
+-----
+
+- Python 3 support
+- Fix certum_certificate.crt
+
 
 1.0.7
 -----
