@@ -7,7 +7,7 @@ import rfc3161
 
 
 def default_test(tsa_server, certificate, username=None, password=None, data='xx', nonce=None, **kwargs):
-    with open(certificate, 'r') as f:
+    with open(certificate, 'rb') as f:
         certificate_data = f.read()
 
     kwargs.update({
@@ -23,11 +23,10 @@ def default_test(tsa_server, certificate, username=None, password=None, data='xx
     kwargs = {}
     if nonce:
         kwargs['nonce'] = nonce
-    value, substrate = timestamper(data=data, **kwargs)
-    assert value is not False, substrate
+    value = timestamper(data=data, **kwargs)
+    assert value is not False
     assert isinstance(rfc3161.get_timestamp(value), datetime.datetime)
     assert value is not None
-    assert substrate == ''
 
 
 def test_time_certum_pl():

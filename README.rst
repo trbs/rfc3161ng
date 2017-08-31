@@ -38,13 +38,6 @@ Example
     datetime.datetime(2014, 4, 25, 9, 34, 16)
 
 
-Install on MAC
-==============
-
-    # workaround to allow m2crypto to install on mac with homebrew
-    env LDFLAGS="-L$(brew --prefix openssl)/lib" CFLAGS="-I$(brew --prefix openssl)/include" SWIG_FEATURES="-cpperraswarn -includeall -I$(brew --prefix openssl)/include"
-
-
 Authors
 =======
 

@@ -8,6 +8,9 @@ Changelog
 - Python 3 support
 - Fix certum_certificate.crt
 - Fix style
+- Fix bug(s) with handling requests library and errors from requests
+- Improved API by using exceptions instead of returning error codes
+- Switched to cryptography instead of M2Crypto
 
 
 1.0.7

@@ -12,9 +12,6 @@ from .api import (
     TimestampingError, get_timestamp
 )
 
-
-VERSION = '1.0.6'
-
 __all__ = (
     'VERSION',
 
@@ -28,3 +25,5 @@ __all__ = (
     'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
     'TimestampingError', 'get_timestamp',
 )
+
+VERSION = '1.0.6'

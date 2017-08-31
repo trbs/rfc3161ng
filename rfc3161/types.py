@@ -106,10 +106,10 @@ class TimeStampToken(ContentInfo):
 
     @property
     def tst_info(self):
-        x, substrate = decoder.decode(str(self.content['contentInfo']['content']))
+        x, substrate = decoder.decode(bytes(self.content['contentInfo']['content']))
         if substrate:
             raise ValueError('Incomplete decoding')
-        x, substrate = decoder.decode(str(x), asn1Spec=TSTInfo())
+        x, substrate = decoder.decode(bytes(x), asn1Spec=TSTInfo())
         if substrate:
             raise ValueError('Incomplete decoding')
         return x
