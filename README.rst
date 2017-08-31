@@ -27,15 +27,14 @@ has some additional patches such as Python3 support.
 Example
 =======
 
-    >>> import rfc3161
-    >>> certificate = file('data/certum_certificate.crt').read()
-    >>> rt = rfc3161.RemoteTimestamper('http://time.certum.pl', certificate=certificate)
-    >>> rt.timestamp(data='John Doe')
-    ('...', '')
-    >>> rt.check(_, data='John Doe')
-    (True, '')
-    >>> rfc3161.get_timestamp(tst)
-    datetime.datetime(2014, 4, 25, 9, 34, 16)
+    >>> import rfc3161ng
+    >>> certificate = open('data/certum_certificate.crt', 'rb').read()
+    >>> rt = rfc3161ng.RemoteTimestamper('http://time.certum.pl', certificate=certificate)
+    >>> tst = rt.timestamp(data=b'John Doe')
+    >>> rt.check(tst, data=b'John Doe')
+    True
+    >>> rfc3161ng.get_timestamp(tst)
+    datetime.datetime(2017, 8, 31, 15, 42, 58, tzinfo=tzutc())
 
 
 Authors
