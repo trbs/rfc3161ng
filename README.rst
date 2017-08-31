@@ -51,21 +51,3 @@ Authors
 Benjamin Dauvergne <bdauvergne@entrouvert.com>
 Michael Gebetsroither <michael@mgeb.org>
 Bas van Oostveen <trbs@trbs.net>
-
-
-Changelog
-=========
-
-2.0.0
------
-
-- Python 3 support
-- Fix certum_certificate.crt
-
-
-1.0.7
------
-
-- use dateutil to parse genTime
-- fix bad instantiation of UTF8String in PKIFreeText
-- use tox and py.test
