@@ -11,7 +11,7 @@ def default_test(tsa_server, certificate, username=None, password=None, data='xx
         certificate_data = f.read()
 
     kwargs.update({
-            'certificate': certificate_data,
+        'certificate': certificate_data,
     })
     if username and password:
         kwargs.update({

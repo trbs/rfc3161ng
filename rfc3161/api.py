@@ -8,17 +8,21 @@ from pyasn1_modules import rfc2459
 from pyasn1.type import univ
 from pyasn1.error import PyAsn1Error
 import M2Crypto.X509 as X509
-import socket
+# import socket
 
 import rfc3161
 
-__all__ = ('RemoteTimestamper','check_timestamp','get_hash_oid',
-    'TimestampingError', 'get_timestamp')
+__all__ = (
+    'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
+    'TimestampingError', 'get_timestamp'
+)
 
-id_attribute_messageDigest = univ.ObjectIdentifier((1,2,840,113549,1,9,4,))
+id_attribute_messageDigest = univ.ObjectIdentifier((1, 2, 840, 113549, 1, 9, 4))
+
 
 def get_hash_oid(hashname):
-    return rfc3161.__dict__['id_'+hashname]
+    return rfc3161.__dict__['id_' + hashname]
+
 
 def get_hash_from_oid(oid):
     h = rfc3161.oid_to_hash.get(oid)
@@ -26,12 +30,15 @@ def get_hash_from_oid(oid):
         raise ValueError('unsupported hash algorithm', oid)
     return h
 
+
 def get_hash_class_from_oid(oid):
     h = get_hash_from_oid(oid)
     return getattr(hashlib, h)
 
+
 class TimestampingError(RuntimeError):
     pass
+
 
 def get_timestamp(tst):
     try:
@@ -49,8 +56,9 @@ def get_timestamp(tst):
             raise ValueError("extra data after tst")
         genTime = tstinfo.getComponentByName('genTime')
         return dateutil.parser.parse(str(genTime))
-    except PyAsn1Error, e:
-        raise ValueError('not a valid TimeStampToken', e)
+    except PyAsn1Error as exc:
+        raise ValueError('not a valid TimeStampToken', exc)
+
 
 def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, nonce=None):
     hashname = hashname or 'sha1'
@@ -77,9 +85,8 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
         return False, 'nonce is different or missing'
     # check message imprint with respect to locally computed digest
     message_imprint = tst.tst_info.message_imprint
-    if message_imprint.hash_algorithm[0] != get_hash_oid(hashname) or \
-        str(message_imprint.hashed_message) != digest:
-            return False, 'Message imprint mismatch'
+    if message_imprint.hash_algorithm[0] != get_hash_oid(hashname) or str(message_imprint.hashed_message) != digest:
+        return False, 'Message imprint mismatch'
     #
     if not len(signed_data['signerInfos']):
         return False, 'No signature'
@@ -88,11 +95,11 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
     # check content type
     if tst.content['contentInfo']['contentType'] != rfc3161.id_ct_TSTInfo:
         return False, "Signed content type is wrong: %s != %s" % (
-            tst.content['contentInfo']['contentType'], rfc3161.id_ct_TSTInfo)
+            tst.content['contentInfo']['contentType'], rfc3161.id_ct_TSTInfo
+        )
 
     # check signed data digest
-    content = str(decoder.decode(str(tst.content['contentInfo']['content']),
-        asn1Spec=univ.OctetString())[0])
+    content = str(decoder.decode(str(tst.content['contentInfo']['content']), asn1Spec=univ.OctetString())[0])
     # if there is authenticated attributes, they must contain the message
     # digest and they are the signed data otherwise the content is the
     # signed data
@@ -105,8 +112,7 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
         for authenticated_attribute in authenticated_attributes:
             if authenticated_attribute[0] == id_attribute_messageDigest:
                 try:
-                    signed_digest = str(decoder.decode(str(authenticated_attribute[1][0]),
-                            asn1Spec=univ.OctetString())[0])
+                    signed_digest = str(decoder.decode(str(authenticated_attribute[1][0]), asn1Spec=univ.OctetString())[0])
                     if signed_digest != content_digest:
                         return False, 'Content digest != signed digest'
                     s = univ.SetOf()
@@ -132,7 +138,6 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
     return True, ''
 
 
-
 class RemoteTimestamper(object):
     def __init__(self, url, certificate=None, capath=None, cafile=None, username=None, password=None, hashname=None, include_tsa_certificate=False, timeout=10):
         self.url = url
@@ -153,12 +158,22 @@ class RemoteTimestamper(object):
         return self.check(tst, digest=digest, nonce=nonce)
 
     def check(self, tst, data=None, digest=None, nonce=None):
-        return check_timestamp(tst, digest=digest, data=data, nonce=nonce,
-                certificate=self.certificate, hashname=self.hashname)
+        return check_timestamp(
+            tst,
+            digest=digest,
+            data=data,
+            nonce=nonce,
+            certificate=self.certificate,
+            hashname=self.hashname,
+        )
 
     def timestamp(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
-        return self(data=data, digest=digest,
-                include_tsa_certificate=include_tsa_certificate, nonce=nonce)
+        return self(
+            data=data,
+            digest=digest,
+            include_tsa_certificate=include_tsa_certificate,
+            nonce=nonce,
+        )
 
     def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
         algorithm_identifier = rfc2459.AlgorithmIdentifier()
@@ -181,15 +196,19 @@ class RemoteTimestamper(object):
             request.setComponentByPosition(3, int(nonce))
         request.setComponentByPosition(4, include_tsa_certificate if include_tsa_certificate is not None else self.include_tsa_certificate)
         binary_request = encoder.encode(request)
-        headers = { 'Content-Type': 'application/timestamp-query' }
-        if self.username != None:
+        headers = {'Content-Type': 'application/timestamp-query'}
+        if self.username is not None:
             base64string = base64.standard_b64encode('%s:%s' % (self.username, self.password))
             headers['Authorization'] = "Basic %s" % base64string
         try:
-            response = requests.post(self.url, data=binary_request,
-                    timeout=self.timeout, headers=headers)
-        except request.RequestException, e:
-            raise TimestampingError('Unable to send the request to %r' % self.url, e)
+            response = requests.post(
+                self.url,
+                data=binary_request,
+                timeout=self.timeout,
+                headers=headers,
+            )
+        except request.RequestException as exc:
+            raise TimestampingError('Unable to send the request to %r' % self.url, exc)
         tst_response, substrate = decoder.decode(response.content, asn1Spec=rfc3161.TimeStampResp())
         if substrate:
             return False, 'Extra data returned'
@@ -198,5 +217,3 @@ class RemoteTimestamper(object):
             return encoder.encode(tst_response.time_stamp_token), ''
         else:
             return False, message
-
-
