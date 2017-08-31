@@ -3,7 +3,7 @@ import datetime
 
 # from pyasn1.type import univ
 
-import rfc3161
+import rfc3161ng
 
 
 def default_test(tsa_server, certificate, username=None, password=None, data='xx', nonce=None, **kwargs):
@@ -19,13 +19,13 @@ def default_test(tsa_server, certificate, username=None, password=None, data='xx
             'password': password,
         })
 
-    timestamper = rfc3161.RemoteTimestamper(tsa_server, **kwargs)
+    timestamper = rfc3161ng.RemoteTimestamper(tsa_server, **kwargs)
     kwargs = {}
     if nonce:
         kwargs['nonce'] = nonce
     value = timestamper(data=data, **kwargs)
     assert value is not False
-    assert isinstance(rfc3161.get_timestamp(value), datetime.datetime)
+    assert isinstance(rfc3161ng.get_timestamp(value), datetime.datetime)
     assert value is not None
 
 

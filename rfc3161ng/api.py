@@ -9,10 +9,10 @@ from pyasn1.type import univ
 from pyasn1.error import PyAsn1Error
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import padding  # , utils
+from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 
-import rfc3161
+import rfc3161ng
 
 __all__ = (
     'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
@@ -23,11 +23,11 @@ id_attribute_messageDigest = univ.ObjectIdentifier((1, 2, 840, 113549, 1, 9, 4))
 
 
 def get_hash_oid(hashname):
-    return rfc3161.__dict__['id_' + hashname]
+    return rfc3161ng.__dict__['id_' + hashname]
 
 
 def get_hash_from_oid(oid):
-    h = rfc3161.oid_to_hash.get(oid)
+    h = rfc3161ng.oid_to_hash.get(oid)
     if h is None:
         raise ValueError('unsupported hash algorithm', oid)
     return h
@@ -44,8 +44,8 @@ class TimestampingError(RuntimeError):
 
 def get_timestamp(tst):
     try:
-        if not isinstance(tst, rfc3161.TimeStampToken):
-            tst, substrate = decoder.decode(tst, asn1Spec=rfc3161.TimeStampToken())
+        if not isinstance(tst, rfc3161ng.TimeStampToken):
+            tst, substrate = decoder.decode(tst, asn1Spec=rfc3161ng.TimeStampToken())
             if substrate:
                 raise ValueError("extra data after tst")
 
@@ -53,7 +53,7 @@ def get_timestamp(tst):
         tstinfo, substrate = decoder.decode(tstinfo, asn1Spec=univ.OctetString())
         if substrate:
             raise ValueError("extra data after tst")
-        tstinfo, substrate = decoder.decode(tstinfo, asn1Spec=rfc3161.TSTInfo())
+        tstinfo, substrate = decoder.decode(tstinfo, asn1Spec=rfc3161ng.TSTInfo())
         if substrate:
             raise ValueError("extra data after tst")
         genTime = tstinfo.getComponentByName('genTime')
@@ -87,8 +87,8 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
         hashobj.update(data)
         digest = hashobj.digest()
 
-    if not isinstance(tst, rfc3161.TimeStampToken):
-        tst, substrate = decoder.decode(tst, asn1Spec=rfc3161.TimeStampToken())
+    if not isinstance(tst, rfc3161ng.TimeStampToken):
+        tst, substrate = decoder.decode(tst, asn1Spec=rfc3161ng.TimeStampToken())
         if substrate:
             raise ValueError("extra data after tst")
     signed_data = tst.content
@@ -104,9 +104,9 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
     # We validate only one signature
     signer_info = signed_data['signerInfos'][0]
     # check content type
-    if tst.content['contentInfo']['contentType'] != rfc3161.id_ct_TSTInfo:
+    if tst.content['contentInfo']['contentType'] != rfc3161ng.id_ct_TSTInfo:
         raise ValueError("Signed content type is wrong: %s != %s" % (
-            tst.content['contentInfo']['contentType'], rfc3161.id_ct_TSTInfo
+            tst.content['contentInfo']['contentType'], rfc3161ng.id_ct_TSTInfo
         ))
 
     # check signed data digest
@@ -190,7 +190,7 @@ class RemoteTimestamper(object):
     def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
         algorithm_identifier = rfc2459.AlgorithmIdentifier()
         algorithm_identifier.setComponentByPosition(0, get_hash_oid(self.hashname))
-        message_imprint = rfc3161.MessageImprint()
+        message_imprint = rfc3161ng.MessageImprint()
         message_imprint.setComponentByPosition(0, algorithm_identifier)
         hashobj = hashlib.new(self.hashname)
         if data:
@@ -203,7 +203,7 @@ class RemoteTimestamper(object):
         else:
             raise ValueError('You must pass some data to digest, or the digest')
         message_imprint.setComponentByPosition(1, digest)
-        request = rfc3161.TimeStampReq()
+        request = rfc3161ng.TimeStampReq()
         request.setComponentByPosition(0, 'v1')
         request.setComponentByPosition(1, message_imprint)
         if nonce is not None:
@@ -228,7 +228,7 @@ class RemoteTimestamper(object):
             response.raise_for_status()
         except requests.RequestException as exc:
             raise TimestampingError('Unable to send the request to %r' % self.url, exc)
-        tst_response, substrate = decoder.decode(response.content, asn1Spec=rfc3161.TimeStampResp())
+        tst_response, substrate = decoder.decode(response.content, asn1Spec=rfc3161ng.TimeStampResp())
         if substrate:
             raise ValueError('Extra data returned')
         self.check_response(tst_response, digest, nonce=nonce)

@@ -26,4 +26,4 @@ __all__ = (
     'TimestampingError', 'get_timestamp',
 )
 
-VERSION = '1.0.6'
+VERSION = '2.0.0'
