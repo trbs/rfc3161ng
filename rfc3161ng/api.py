@@ -264,14 +264,14 @@ def encode_timestamp_response(response):
 
 
 def decode_timestamp_request(request):
-    tsr, substrate = decoder.decode(request, asn1Spec=rfc3161ng.TimeStampReq())
+    tsq, substrate = decoder.decode(request, asn1Spec=rfc3161ng.TimeStampReq())
     if substrate:
         raise ValueError('Extra data returned')
-    return tsr
+    return tsq
 
 
 def decode_timestamp_response(response):
-    tst_response, substrate = decoder.decode(response, asn1Spec=rfc3161ng.TimeStampResp())
+    tsr, substrate = decoder.decode(response, asn1Spec=rfc3161ng.TimeStampResp())
     if substrate:
         raise ValueError('Extra data returned')
-    return tst_response
+    return tsr
