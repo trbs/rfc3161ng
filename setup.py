@@ -35,5 +35,6 @@ setup(
         'pyasn1_modules',
         'requests',
         'cryptography',
+        'pytz',
     ]
 )
