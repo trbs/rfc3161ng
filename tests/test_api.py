@@ -74,12 +74,12 @@ def test_encode_decode_timestamp_request():
 
 def test_generalized_time_decoding():
     from rfc3161ng.api import generalizedtime_to_utc_datetime
-    
+
     # generalizedTime string, naive == expected datetime
     assert generalizedtime_to_utc_datetime('20180208181004,948468', True) == datetime.datetime(2018, 2, 8, 18, 10, 4, 948468)
     assert generalizedtime_to_utc_datetime('20180208181004', True) == datetime.datetime(2018, 2, 8, 18, 10, 4, 0)
     assert generalizedtime_to_utc_datetime('201802081810', True) == datetime.datetime(2018, 2, 8, 18, 10, 0, 0)
-    assert generalizedtime_to_utc_datetime('2018020818', True) ==  datetime.datetime(2018, 2, 8, 18, 0, 0, 0)
+    assert generalizedtime_to_utc_datetime('2018020818', True) == datetime.datetime(2018, 2, 8, 18, 0, 0, 0)
     assert generalizedtime_to_utc_datetime('20180208181004.948468Z', True) == datetime.datetime(2018, 2, 8, 18, 10, 4, 948468)
     assert generalizedtime_to_utc_datetime('20180208181004.948468+01', True) == datetime.datetime(2018, 2, 8, 17, 10, 4, 948468)
     assert generalizedtime_to_utc_datetime('20180208181004.948468-01', True) == datetime.datetime(2018, 2, 8, 19, 10, 4, 948468)
