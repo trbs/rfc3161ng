@@ -4,7 +4,7 @@ import base64
 import re
 import datetime
 import dateutil.relativedelta
-import pytz
+import dateutil.tz
 
 from pyasn1.codec.der import encoder, decoder
 from pyasn1_modules import rfc2459
@@ -60,16 +60,30 @@ def generalizedtime_to_utc_datetime(gt, naive=True):
             int(d['seconds'] or 0),
             int(float('0.' + d['fractions']) * 1000000 if d['fractions'] else 0)
         )
-        if d['tz'] and d['tz'][0] in ('+', '-'):
-            diff = dateutil.relativedelta.relativedelta(
-                hours=int(d['tz'][1:3]),
-                minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
-            )
-            if d['tz'][0] == '+':
-                dt -= diff
+        if naive:
+            if d['tz'] and d['tz'][0] in ('+', '-'):
+                diff = dateutil.relativedelta.relativedelta(
+                    hours=int(d['tz'][1:3]),
+                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+                )
+                if d['tz'][0] == '+':
+                    dt -= diff
+                else:
+                    dt += diff
+            return dt
+        else:
+            if d['tz'] and re.match('^[+\-]\d*[^0]\d*$', d['tz']):
+                diff = datetime.timedelta(
+                    hours=int(d['tz'][1:3]),
+                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+                )
+                name = d['tz'][0:3]
+                if len(d['tz']) > 3:
+                    name += ':' + d['tz'][3:5]
+                dt = dt.replace(tzinfo=dateutil.tz.tzoffset(name, diff if d['tz'][0] == '+' else -diff))
             else:
-                dt += diff
-        return dt if naive else pytz.utc.localize(dt)
+                dt = dt.replace(tzinfo=dateutil.tz.tzutc())
+            return dt
     else:
         raise ValueError("not an ASN.1 generalizedTime: '%s'" % (gt,))
 
