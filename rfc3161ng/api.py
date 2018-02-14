@@ -1,8 +1,11 @@
 import hashlib
 import requests
 import base64
+import re
+import datetime
+import dateutil.relativedelta
+import dateutil.tz
 
-import dateutil.parser
 from pyasn1.codec.der import encoder, decoder
 from pyasn1_modules import rfc2459
 from pyasn1.type import univ
@@ -44,7 +47,48 @@ class TimestampingError(RuntimeError):
     pass
 
 
-def get_timestamp(tst):
+def generalizedtime_to_utc_datetime(gt, naive=True):
+    m = re.match('(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})(?:(?P<minutes>\d{2})(?:(?P<seconds>\d{2})(?:[.,](?P<fractions>\d*))?)?)?(?P<tz>Z|[+-]\d{2}(?:\d{2})?)?', gt)
+    if m:
+        d = m.groupdict()
+        dt = datetime.datetime(
+            int(d['year']),
+            int(d['month']),
+            int(d['day']),
+            int(d['hour']),
+            int(d['minutes'] or 0),
+            int(d['seconds'] or 0),
+            int(float('0.' + d['fractions']) * 1000000 if d['fractions'] else 0)
+        )
+        if naive:
+            if d['tz'] and d['tz'][0] in ('+', '-'):
+                diff = dateutil.relativedelta.relativedelta(
+                    hours=int(d['tz'][1:3]),
+                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+                )
+                if d['tz'][0] == '+':
+                    dt -= diff
+                else:
+                    dt += diff
+            return dt
+        else:
+            if d['tz'] and re.match('^[+\-]\d*[^0]\d*$', d['tz']):
+                diff = datetime.timedelta(
+                    hours=int(d['tz'][1:3]),
+                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+                )
+                name = d['tz'][0:3]
+                if len(d['tz']) > 3:
+                    name += ':' + d['tz'][3:5]
+                dt = dt.replace(tzinfo=dateutil.tz.tzoffset(name, diff if d['tz'][0] == '+' else -diff))
+            else:
+                dt = dt.replace(tzinfo=dateutil.tz.tzutc())
+            return dt
+    else:
+        raise ValueError("not an ASN.1 generalizedTime: '%s'" % (gt,))
+
+
+def get_timestamp(tst, naive=True):
     try:
         if not isinstance(tst, rfc3161ng.TimeStampToken):
             tst, substrate = decoder.decode(tst, asn1Spec=rfc3161ng.TimeStampToken())
@@ -59,7 +103,7 @@ def get_timestamp(tst):
         if substrate:
             raise ValueError("extra data after tst")
         genTime = tstinfo.getComponentByName('genTime')
-        return dateutil.parser.parse(str(genTime))
+        return generalizedtime_to_utc_datetime(str(genTime), naive)
     except PyAsn1Error as exc:
         raise ValueError('not a valid TimeStampToken', exc)
 
