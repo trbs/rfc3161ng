@@ -37,6 +37,13 @@ def test_time_certum_pl():
     )
 
 
+def test_freetsa_org():
+    default_test(
+        'http://freetsa.org/tsr',
+        os.path.join('data/freetsa.crt'),
+    )
+
+
 def test_teszt_e_szigno_hu():
     data = '{"comment": "Envoi en Commission", "to": "Benjamin Dauvergne", "filetype": "Arr\u00eat CC", "from": "Benjamin Dauvergne", "files": [{"name": "affectations_ange1d.xlsx", "digest": "ce57e4ba353107dddaab91b9ad26c0569ffe0f94", "size": 16279}]}'
     default_test(
