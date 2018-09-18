@@ -233,7 +233,7 @@ class RemoteTimestamper(object):
             nonce=nonce,
         )
 
-    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
+    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, return_tsr=False):
         if data:
             digest = data_to_digest(data, self.hashname)
 
@@ -264,9 +264,11 @@ class RemoteTimestamper(object):
             response.raise_for_status()
         except requests.RequestException as exc:
             raise TimestampingError('Unable to send the request to %r' % self.url, exc)
-        tst_response = decode_timestamp_response(response.content)
-        self.check_response(tst_response, digest, nonce=nonce)
-        return encoder.encode(tst_response.time_stamp_token)
+        tsr = decode_timestamp_response(response.content)
+        self.check_response(tsr, digest, nonce=nonce)
+        if return_tsr:
+            return tsr
+        return encoder.encode(tsr.time_stamp_token)
 
 
 def data_to_digest(data, hashname='sha1'):
@@ -290,13 +292,13 @@ def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_
     else:
         raise ValueError('You must pass some data to digest, or the digest')
     message_imprint.setComponentByPosition(1, digest)
-    request = rfc3161ng.TimeStampReq()
-    request.setComponentByPosition(0, 'v1')
-    request.setComponentByPosition(1, message_imprint)
+    tsq = rfc3161ng.TimeStampReq()
+    tsq.setComponentByPosition(0, 'v1')
+    tsq.setComponentByPosition(1, message_imprint)
     if nonce is not None:
-        request.setComponentByPosition(3, int(nonce))
-    request.setComponentByPosition(4, include_tsa_certificate)
-    return request
+        tsq.setComponentByPosition(3, int(nonce))
+    tsq.setComponentByPosition(4, include_tsa_certificate)
+    return tsq
 
 
 def encode_timestamp_request(request):
