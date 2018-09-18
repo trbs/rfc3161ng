@@ -10,7 +10,7 @@ from pyasn1.codec.der import encoder
 import rfc3161ng
 
 
-def default_test(tsa_server, certificate, username=None, password=None, data='xx', nonce=None, **kwargs):
+def _default_test(tsa_server, certificate, username=None, password=None, data='xx', nonce=None, **kwargs):
     with open(certificate, 'rb') as f:
         certificate_data = f.read()
 
@@ -53,14 +53,14 @@ def test_verify_timestamp_response_with_openssl():
 
 
 def test_time_certum_pl():
-    default_test(
+    _default_test(
         'http://time.certum.pl',
         os.path.join(os.path.dirname(__file__), '../data/certum_certificate.crt'),
     )
 
 
 def test_freetsa_org():
-    default_test(
+    _default_test(
         'http://freetsa.org/tsr',
         os.path.join('data/freetsa.crt'),
     )
@@ -68,7 +68,7 @@ def test_freetsa_org():
 
 def test_teszt_e_szigno_hu():
     data = '{"comment": "Envoi en Commission", "to": "Benjamin Dauvergne", "filetype": "Arr\u00eat CC", "from": "Benjamin Dauvergne", "files": [{"name": "affectations_ange1d.xlsx", "digest": "ce57e4ba353107dddaab91b9ad26c0569ffe0f94", "size": 16279}]}'
-    default_test(
+    _default_test(
         'https://teszt.e-szigno.hu:440/tsa',
         username='teszt',
         password='teszt',
@@ -80,7 +80,7 @@ def test_teszt_e_szigno_hu():
 
 def test_teszt_e_szigno_hu_with_nonce():
     data = '{"comment": "Envoi en Commission", "to": "Benjamin Dauvergne", "filetype": "Arr\u00eat CC", "from": "Benjamin Dauvergne", "files": [{"name": "affectations_ange1d.xlsx", "digest": "ce57e4ba353107dddaab91b9ad26c0569ffe0f94", "size": 16279}]}'
-    default_test(
+    _default_test(
         'https://teszt.e-szigno.hu:440/tsa',
         username='teszt',
         password='teszt',
