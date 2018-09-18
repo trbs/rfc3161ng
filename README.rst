@@ -23,6 +23,9 @@ protocol from RFC3161.
 This started as a fork of https://dev.entrouvert.org/projects/python-rfc3161 and
 has some additional patches such as Python3 support.
 
+The latest version of this library is available from
+https://github.com/trbs/rfc3161ng/ .
+
 
 Example
 =======
