@@ -57,7 +57,9 @@ class PKIStatus(univ.Integer):
         ('grantedWithMods', 1),
         # -- when the PKIStatus contains the value one a TimeStampToken,
         #   with modifications, is present.
-        ('rejection', 2), ('waiting', 3), ('revocationWarning', 4),
+        ('rejection', 2),
+        ('waiting', 3),
+        ('revocationWarning', 4),
         # -- this message contains a warning that a revocation is
         # -- imminent
         ('revocationNotification', 5),
