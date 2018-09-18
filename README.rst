@@ -55,6 +55,6 @@ Example
 Authors
 =======
 
-Benjamin Dauvergne <bdauvergne@entrouvert.com>
-Michael Gebetsroither <michael@mgeb.org>
-Bas van Oostveen <trbs@trbs.net>
+ * Benjamin Dauvergne <bdauvergne@entrouvert.com>
+ * Michael Gebetsroither <michael@mgeb.org>
+ * Bas van Oostveen <trbs@trbs.net>
