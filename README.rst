@@ -23,6 +23,21 @@ protocol from RFC3161.
 This started as a fork of https://dev.entrouvert.org/projects/python-rfc3161 and
 has some additional patches such as Python3 support.
 
+The latest version of this library is available from
+https://github.com/trbs/rfc3161ng/ .
+
+
+Public providers
+================
+
+There are several timestamping services around.  Here is a list of
+publicly available services you can try:
+
+ * http://freetsa.org/tsr
+ * http://time.certum.pl
+ * http://timestamp.comodoca.com/rfc3161
+ * http://timestamp.geotrust.com/tsa
+ * https://teszt.e-szigno.hu:440/tsa
 
 Example
 =======
