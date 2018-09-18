@@ -27,6 +27,18 @@ The latest version of this library is available from
 https://github.com/trbs/rfc3161ng/ .
 
 
+Public providers
+================
+
+There are several timestamping services around.  Here is a list of
+publicly available services you can try:
+
+ * http://freetsa.org/tsr
+ * http://time.certum.pl
+ * http://timestamp.comodoca.com/rfc3161
+ * http://timestamp.geotrust.com/tsa
+ * https://teszt.e-szigno.hu:440/tsa
+
 Example
 =======
 
