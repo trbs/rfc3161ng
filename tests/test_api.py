@@ -1,8 +1,11 @@
 import os.path
 import datetime
 import dateutil.tz
+import subprocess
 
+from tempfile import NamedTemporaryFile
 # from pyasn1.type import univ
+from pyasn1.codec.der import encoder
 
 import rfc3161ng
 
@@ -28,6 +31,25 @@ def default_test(tsa_server, certificate, username=None, password=None, data='xx
     assert value is not False
     assert isinstance(rfc3161ng.get_timestamp(value), datetime.datetime)
     assert value is not None
+
+
+def test_verify_timestamp_response_with_openssl():
+    with open(os.path.join(os.path.dirname(__file__), '../data/freetsa.crt'), 'rb') as f:
+        certificate_data = f.read()
+
+    timestamper = rfc3161ng.RemoteTimestamper('http://freetsa.org/tsr', certificate=certificate_data)
+
+    with NamedTemporaryFile() as data_f, NamedTemporaryFile() as tsr_f:
+        data_f.write(b"Hello World from rfc3161ng\n")
+        data_f.flush()
+        data_f.seek(0)
+
+        tsr = timestamper(data=data_f.read(), return_tsr=True)
+        tsr_f.write(encoder.encode(tsr))
+        tsr_f.flush()
+
+        args = ["openssl", "ts", "-verify", "-data", data_f.name, "-in", tsr_f.name, "-CAfile", "data/freetsa_cacert.pem", "-untrusted", "data/freetsa.crt"]
+        subprocess.check_call(args)
 
 
 def test_time_certum_pl():
