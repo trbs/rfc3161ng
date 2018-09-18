@@ -9,7 +9,8 @@ from .constants import (
 )
 from .api import (
     RemoteTimestamper, check_timestamp, get_hash_oid,
-    TimestampingError, get_timestamp, make_timestamp_request,
+    TimestampingError, get_timestamp,
+    make_timestamp_request, make_timestamp_response,
     encode_timestamp_request, encode_timestamp_response,
     decode_timestamp_request, decode_timestamp_response,
 )
@@ -25,7 +26,8 @@ __all__ = (
     'id_sha512', 'id_ct_TSTInfo', 'oid_to_hash',
 
     'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
-    'TimestampingError', 'get_timestamp', 'make_timestamp_request',
+    'TimestampingError', 'get_timestamp',
+    'make_timestamp_request', 'make_timestamp_response',
     'encode_timestamp_request', 'encode_timestamp_response',
     'decode_timestamp_request', 'decode_timestamp_response',
 )

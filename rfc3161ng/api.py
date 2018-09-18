@@ -19,7 +19,8 @@ import rfc3161ng
 
 __all__ = (
     'RemoteTimestamper', 'check_timestamp', 'get_hash_oid',
-    'TimestampingError', 'get_timestamp', 'make_timestamp_request',
+    'TimestampingError', 'get_timestamp',
+    'make_timestamp_request', 'make_timestamp_response',
     'encode_timestamp_request', 'encode_timestamp_response',
     'decode_timestamp_request', 'decode_timestamp_response',
 )
@@ -299,6 +300,72 @@ def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_
         tsq.setComponentByPosition(3, int(nonce))
     tsq.setComponentByPosition(4, include_tsa_certificate)
     return tsq
+
+
+def make_timestamp_response(status, status_string=None, fail_info=None, hashname=None):
+    tsr = rfc3161ng.TimeStampResp()
+
+    pki_status = rfc3161ng.PKIStatus(status)
+
+    pki_status_info = rfc3161ng.PKIStatusInfo()
+    pki_status_info.setComponentByPosition(0, pki_status)
+    if status_string:
+        pki_status_string = rfc3161ng.PKIFreeText(status_string)
+        pki_status_info.setComponentByPosition(1, pki_status_string)
+    if fail_info:
+        pki_fail_info = rfc3161ng.PKIFailureInfo(fail_info)
+        pki_status_info.setComponentByPosition(2, pki_fail_info)
+
+    tsr.setComponentByPosition(0, pki_status_info)
+
+    if pki_status in (0, 1):
+        if not hashname:
+            raise ValueError("hashname must be given")
+        # time_stamp_token = rfc3161ng.TimeStampToken()
+
+        from pyasn1_modules.rfc2315 import signedData
+        tsr.time_stamp_token['contentType'] = signedData
+        signed_data = tsr.time_stamp_token.content
+        signed_data.setComponentByName('version', 3)
+
+        digest_algorithm_identifiers = signed_data['digestAlgorithms']
+        # TODO: this is wrong here ? should this be certificate hash algo ?
+        digest_algorithm_identifiers[0][0] = get_hash_oid(hashname)
+
+        tst_info = rfc3161ng.TSTInfo()
+        tst_info['version'] = 'v1'
+        # TODO: We do not have a TSA policy as of yet
+        # tst_info['policy'] =
+
+        #    -- MUST have the same value as the similar field in
+        #    -- TimeStampReq
+
+        message_imprint = tst_info['messageImprint']
+        message_imprint.hash_algorithm[0] = get_hash_oid(hashname)
+        message_imprint[1] = b'\xde\xad\xbe\xed'  # fixme, this is hashed_message
+
+        tst_info['serialNumber'] = 0  # FIXME
+        tst_info['genTime'] = "20170902142905Z"  # FIXME
+        tst_info['accuracy'][0] = 60  # FIXME: accuracy represents the time deviation around the UTC time contained in GeneralizedTime.
+        tst_info['ordering'] = False
+
+        # The purpose of the tsa field is to give a hint in identifying the
+        # name of the TSA.  If present, it MUST correspond to one of the
+        # subject names included in the certificate that is to be used to
+        # verify the token.
+        # tst_info['tsa'] =
+
+        content_info = signed_data['contentInfo']
+        content_info['contentType'] = rfc3161ng.id_ct_TSTInfo
+        content_info['content'] = encoder.encode(tst_info)
+
+        # certificates = signed_data['certificates']
+        # crls = signed_data['crls']
+
+        signer_infos = signed_data['signerInfos']
+
+
+    return tsr
 
 
 def encode_timestamp_request(request):
