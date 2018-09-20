@@ -52,6 +52,29 @@ Example
     datetime.datetime(2017, 8, 31, 15, 42, 58, tzinfo=tzutc())
 
 
+Verifying timestamp using OpenSSL
+=================================
+
+One can verify the timestamp returned by the timeserver by using OpenSSL.
+For example with:
+
+  $ openssl ts -verify -data data_file.txt -in data_file.tsr -CAfile cacert.pem -untrusted tsa.crt
+
+To save the tsr you can use code similar to:
+
+    >>> from pyasn1.codec.der import encoder
+    >>> import rfc3161ng
+    >>> ...
+    >>> timestamper = rfc3161ng.RemoteTimestamper('http://freetsa.org/tsr', certificate=certificate_data)
+    >>> tsr = timestamper(data=data_file.read(), return_tsr=True)
+    >>> with open("data_file.tsr", "wb") as f:
+    >>>     f.write(encoder.encode(tsr))
+
+Alternatively you can just save the raw `response.content` returned from the certification server.
+
+There is a test which also covers this in `test_verify_timestamp_response_with_openssl`.
+
+
 Authors
 =======
 
