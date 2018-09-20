@@ -93,7 +93,10 @@ def test_teszt_e_szigno_hu_with_nonce():
 
 def test_encode_decode_timestamp_request():
     tsq = rfc3161ng.make_timestamp_request(data="test")
-    assert tsq.prettyPrint() == "TimeStampReq:\n version=v1\n messageImprint=MessageImprint:\n  hashAlgorithm=AlgorithmIdentifier:\n   algorithm=1.3.14.3.2.26\n\n  hashedMessage=0xa94a8fe5ccb19ba61c4c0873d391e987982fbbd3\n\n certReq=False\n"
+    pretty_print_str = "TimeStampReq:\n version=v1\n messageImprint=MessageImprint:\n  hashAlgorithm=AlgorithmIdentifier:\n   algorithm=1.3.14.3.2.26\n\n  hashedMessage=0xa94a8fe5ccb19ba61c4c0873d391e987982fbbd3\n\n certReq=False\n"
+    # Some versions of prettyPrint() include quotes, others do not.
+    # Hide the difference by removing the quotes.
+    assert tsq.prettyPrint().replace("'", "") == pretty_print_str
     bin_tsq = rfc3161ng.encode_timestamp_request(tsq)
     assert bin_tsq == b'0$\x02\x01\x010\x1f0\x07\x06\x05+\x0e\x03\x02\x1a\x04\x14\xa9J\x8f\xe5\xcc\xb1\x9b\xa6\x1cL\x08s\xd3\x91\xe9\x87\x98/\xbb\xd3'
     tsq2 = rfc3161ng.decode_timestamp_request(bin_tsq)
