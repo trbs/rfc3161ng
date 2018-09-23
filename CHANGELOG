@@ -2,6 +2,18 @@
 Changelog
 =========
 
+2.1.0
+-----
+
+- Fix for #11 Some versions of prettyPrint() include quotes, others do not
+- Add test verify timestamp response with openssl
+- Add test of freetsa.org
+- Add return_tsr option to RemoteTimerstamper object
+- Added License File
+- Updated README
+- ASN.1 generalizedTime to Python datetime parser
+
+
 2.0.4
 -----
 
