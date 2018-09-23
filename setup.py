@@ -6,7 +6,7 @@ with open('README.rst', 'r') as f:
 
 setup(
     name='rfc3161ng',
-    version='2.1.1-dev',
+    version='2.1.1',
     license='MIT',
     url='https://dev.entrouvert.org/projects/python-rfc3161',
     description='Python implementation of the RFC3161 specification, using pyasn1',
