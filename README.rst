@@ -37,6 +37,8 @@ publicly available services you can try:
  * http://time.certum.pl
  * http://timestamp.comodoca.com/rfc3161
  * http://timestamp.geotrust.com/tsa
+ * http://timestamp.globalsign.com/scripts/timstamp.dll
+ * http://tsa.starfieldtech.com
  * https://teszt.e-szigno.hu:440/tsa
 
 Example
