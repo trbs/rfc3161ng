@@ -76,7 +76,7 @@ def generalizedtime_to_utc_datetime(gt, naive=True):
                 diff = datetime.timedelta(
                     hours=int(d['tz'][1:3]),
                     minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
-                )
+                ).total_seconds()
                 name = d['tz'][0:3]
                 if len(d['tz']) > 3:
                     name += ':' + d['tz'][3:5]
