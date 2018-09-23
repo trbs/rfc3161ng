@@ -2,6 +2,13 @@
 Changelog
 =========
 
+2.1.1
+-----
+
+- Use seconds as argument for tzoffset() for python 2 compatibility
+- Added two more timestamping services in README
+
+
 2.1.0
 -----
 
