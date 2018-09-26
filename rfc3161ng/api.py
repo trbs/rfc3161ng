@@ -197,7 +197,7 @@ def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, non
 
 
 class RemoteTimestamper(object):
-    def __init__(self, url, certificate=None, capath=None, cafile=None, username=None, password=None, hashname=None, include_tsa_certificate=False, timeout=10):
+    def __init__(self, url, certificate=None, capath=None, cafile=None, username=None, password=None, hashname=None, include_tsa_certificate=False, timeout=10, tsa_policy_id=None):
         self.url = url
         self.certificate = certificate
         self.capath = capath
@@ -207,6 +207,7 @@ class RemoteTimestamper(object):
         self.hashname = hashname or 'sha1'
         self.include_tsa_certificate = include_tsa_certificate
         self.timeout = timeout
+        self.tsa_policy_id = tsa_policy_id
 
     def check_response(self, response, digest, nonce=None):
         '''
@@ -225,15 +226,16 @@ class RemoteTimestamper(object):
             hashname=self.hashname,
         )
 
-    def timestamp(self, data=None, digest=None, include_tsa_certificate=None, nonce=None):
+    def timestamp(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, tsa_policy_id=None):
         return self(
             data=data,
             digest=digest,
             include_tsa_certificate=include_tsa_certificate,
             nonce=nonce,
+            tsa_policy_id=tsa_policy_id,
         )
 
-    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, return_tsr=False):
+    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, return_tsr=False, tsa_policy_id=None):
         if data:
             digest = data_to_digest(data, self.hashname)
 
@@ -243,6 +245,7 @@ class RemoteTimestamper(object):
             hashname=self.hashname,
             include_tsa_certificate=include_tsa_certificate if include_tsa_certificate is not None else self.include_tsa_certificate,
             nonce=nonce,
+            tsa_policy_id=tsa_policy_id if tsa_policy_id is not None else self.tsa_policy_id
         )
         binary_request = encode_timestamp_request(request)
 
@@ -279,7 +282,7 @@ def data_to_digest(data, hashname='sha1'):
     return hashobj.digest()
 
 
-def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_certificate=False, nonce=None):
+def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_certificate=False, nonce=None, tsa_policy_id=None):
     algorithm_identifier = rfc2459.AlgorithmIdentifier()
     algorithm_identifier.setComponentByPosition(0, get_hash_oid(hashname))
     message_imprint = rfc3161ng.MessageImprint()
@@ -295,6 +298,8 @@ def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_
     tsq = rfc3161ng.TimeStampReq()
     tsq.setComponentByPosition(0, 'v1')
     tsq.setComponentByPosition(1, message_imprint)
+    if tsa_policy_id:
+        tsq.setComponentByPosition(2, rfc3161ng.types.TSAPolicyId(tsa_policy_id))
     if nonce is not None:
         tsq.setComponentByPosition(3, int(nonce))
     tsq.setComponentByPosition(4, include_tsa_certificate)
