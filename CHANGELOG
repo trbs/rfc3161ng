@@ -1,4 +1,3 @@
-
 Changelog
 =========
 
@@ -6,6 +5,7 @@ Changelog
 -----
 
 - Support custom TSAPolicyId
+- Allow for fetching a TSR without validation
 
 
 2.1.1

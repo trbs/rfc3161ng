@@ -30,4 +30,4 @@ __all__ = (
     'decode_timestamp_request', 'decode_timestamp_response',
 )
 
-VERSION = '2.1.2-dev'
+VERSION = '2.1.2'
