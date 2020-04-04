@@ -124,7 +124,7 @@ def load_certificate(signed_data, certificate=b""):
     return x509.load_der_x509_certificate(certificate, backend)
 
 
-def check_timestamp(tst, certificate, data=None, digest=None, hashname=None, nonce=None):
+def check_timestamp(tst, certificate=None, data=None, digest=None, hashname=None, nonce=None):
     hashname = hashname or 'sha1'
     hashobj = hashlib.new(hashname)
     if digest is None:
@@ -214,7 +214,9 @@ class RemoteTimestamper(object):
            Check validity of a TimeStampResponse
         '''
         tst = response.time_stamp_token
-        return self.check(tst, digest=digest, nonce=nonce)
+        if self.certificate:
+            return self.check(tst, digest=digest, nonce=nonce)
+        return tst
 
     def check(self, tst, data=None, digest=None, nonce=None):
         return check_timestamp(

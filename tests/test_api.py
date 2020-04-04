@@ -59,6 +59,20 @@ def test_time_certum_pl():
     )
 
 
+def test_redwax_eu():
+    # https://interop.redwax.eu/rs/timestamp/
+    # CA:  https://interop.redwax.eu/test/simple/ca.der
+    # Server: 'https://interop.redwax.eu/test/timestamp
+    _default_test(
+        'https://interop.redwax.eu/test/timestamp',
+        os.path.join('data/redwax-interop-ca.crt'),
+        hashname='sha256',
+    )
+    _default_test(
+        'https://interop.redwax.eu/test/timestamp',
+        hashname='sha256',
+    )
+
 def test_freetsa_org():
     _default_test(
         'http://freetsa.org/tsr',
