@@ -1,6 +1,6 @@
 from pyasn1.type import univ, namedtype, tag, namedval, constraint, char, useful
-from pyasn1_modules.rfc2459 import AlgorithmIdentifier, Extensions, MAX
-from pyasn1_modules.rfc2315 import ContentInfo, signedData, SignedData, Name
+from pyasn1_modules.rfc2459 import AlgorithmIdentifier, Extensions, MAX, Name
+from pyasn1_modules.rfc2315 import ContentInfo, signedData, SignedData
 from pyasn1.codec.ber import decoder
 
 __all__ = (
