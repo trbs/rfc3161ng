@@ -5,9 +5,9 @@ rfc3161ng
 .. image:: https://img.shields.io/pypi/l/rfc3161ng.svg
    :target: https://raw.githubusercontent.com/trbs/rfc3161ng/master/LICENSE
 
-.. image:: https://travis-ci.org/trbs/rfc3161ng.svg?branch=master
-    :alt: Build Status
-    :target: https://travis-ci.org/trbs/rfc3161ng
+.. image:: https://github.com/trbs/rfc3161ng/workflows/CI/badge.svg?branch=master
+     :target: https://github.com/trbs/rfc3161ng/actions?workflow=CI
+     :alt: CI Status
 
 .. image:: https://img.shields.io/pypi/v/rfc3161ng.svg
     :target: https://pypi.python.org/pypi/rfc3161ng/
