@@ -11,7 +11,7 @@ setup(
     url='https://dev.entrouvert.org/projects/python-rfc3161',
     description='Python implementation of the RFC3161 specification, using pyasn1',
     long_description=long_description,
-    long_description_content_type='test/x-rst',
+    long_description_content_type='text/x-rst',
     author='Benjamin Dauvergne',
     author_email='bdauvergne@entrouvert.com',
     maintainer='trbs',
