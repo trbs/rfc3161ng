@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.1.3
+-----
+
+ - fix: update directoryName to be of type Name (#19)
+
+
 2.1.2
 -----
 
