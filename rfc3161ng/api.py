@@ -48,44 +48,45 @@ class TimestampingError(RuntimeError):
 
 
 def generalizedtime_to_utc_datetime(gt, naive=True):
-    m = re.match('(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})(?:(?P<minutes>\d{2})(?:(?P<seconds>\d{2})(?:[.,](?P<fractions>\d*))?)?)?(?P<tz>Z|[+-]\d{2}(?:\d{2})?)?', gt)
-    if m:
-        d = m.groupdict()
-        dt = datetime.datetime(
-            int(d['year']),
-            int(d['month']),
-            int(d['day']),
-            int(d['hour']),
-            int(d['minutes'] or 0),
-            int(d['seconds'] or 0),
-            int(float('0.' + d['fractions']) * 1000000 if d['fractions'] else 0)
-        )
-        if naive:
-            if d['tz'] and d['tz'][0] in ('+', '-'):
-                diff = dateutil.relativedelta.relativedelta(
-                    hours=int(d['tz'][1:3]),
-                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
-                )
-                if d['tz'][0] == '+':
-                    dt -= diff
-                else:
-                    dt += diff
-            return dt
-        else:
-            if d['tz'] and re.match('^[+\-]\d*[^0]\d*$', d['tz']):
-                diff = datetime.timedelta(
-                    hours=int(d['tz'][1:3]),
-                    minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
-                ).total_seconds()
-                name = d['tz'][0:3]
-                if len(d['tz']) > 3:
-                    name += ':' + d['tz'][3:5]
-                dt = dt.replace(tzinfo=dateutil.tz.tzoffset(name, diff if d['tz'][0] == '+' else -diff))
-            else:
-                dt = dt.replace(tzinfo=dateutil.tz.tzutc())
-            return dt
-    else:
+    m = re.match(r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})(?:(?P<minutes>\d{2})(?:(?P<seconds>\d{2})(?:[.,](?P<fractions>\d*))?)?)?(?P<tz>Z|[+-]\d{2}(?:\d{2})?)?', gt)
+    if not m:
         raise ValueError("not an ASN.1 generalizedTime: '%s'" % (gt,))
+
+    d = m.groupdict()
+    dt = datetime.datetime(
+        int(d['year']),
+        int(d['month']),
+        int(d['day']),
+        int(d['hour']),
+        int(d['minutes'] or 0),
+        int(d['seconds'] or 0),
+        int(float('0.' + d['fractions']) * 1000000 if d['fractions'] else 0)
+    )
+    if naive:
+        if d['tz'] and d['tz'][0] in ('+', '-'):
+            diff = dateutil.relativedelta.relativedelta(
+                hours=int(d['tz'][1:3]),
+                minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+            )
+            if d['tz'][0] == '+':
+                dt -= diff
+            else:
+                dt += diff
+        return dt
+
+    if d['tz'] and re.match(r'^[+\-]\d*[^0]\d*$', d['tz']):
+        diff = datetime.timedelta(
+            hours=int(d['tz'][1:3]),
+            minutes=int(d['tz'][3:5]) if len(d['tz']) > 3 else 0
+        ).total_seconds()
+        name = d['tz'][0:3]
+        if len(d['tz']) > 3:
+            name += ':' + d['tz'][3:5]
+        dt = dt.replace(tzinfo=dateutil.tz.tzoffset(name, diff if d['tz'][0] == '+' else -diff))
+    else:
+        dt = dt.replace(tzinfo=dateutil.tz.tzutc())
+
+    return dt
 
 
 def get_timestamp(tst, naive=True):

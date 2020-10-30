@@ -133,4 +133,3 @@ def test_generalized_time_decoding():
     assert generalizedtime_to_utc_datetime('20180208181004.948468Z', False) == datetime.datetime(2018, 2, 8, 18, 10, 4, 948468, tzinfo=dateutil.tz.tzutc())
     assert generalizedtime_to_utc_datetime('20180208181004.948468-01', False) == datetime.datetime(2018, 2, 8, 19, 10, 4, 948468, tzinfo=dateutil.tz.tzutc())
     assert generalizedtime_to_utc_datetime('20180208181004.948468+0130', False) == datetime.datetime(2018, 2, 8, 16, 40, 4, 948468, tzinfo=dateutil.tz.tzutc())
-
