@@ -2,21 +2,23 @@ import os.path
 import datetime
 import dateutil.tz
 import subprocess
+import pytest
 
 from tempfile import NamedTemporaryFile
-# from pyasn1.type import univ
 from pyasn1.codec.der import encoder
 
 import rfc3161ng
 
 
-def _default_test(tsa_server, certificate, username=None, password=None, data='xx', nonce=None, **kwargs):
-    with open(certificate, 'rb') as f:
-        certificate_data = f.read()
+def _default_test(tsa_server, certificate=None, username=None, password=None, data='xx', nonce=None, **kwargs):
+    if certificate:
+        with open(certificate, 'rb') as f:
+            certificate_data = f.read()
 
-    kwargs.update({
-        'certificate': certificate_data,
-    })
+        kwargs.update({
+            'certificate': certificate_data,
+        })
+
     if username and password:
         kwargs.update({
             'username': username,
@@ -59,19 +61,30 @@ def test_time_certum_pl():
     )
 
 
+@pytest.mark.xfail
 def test_redwax_eu():
     # https://interop.redwax.eu/rs/timestamp/
     # CA:  https://interop.redwax.eu/test/simple/ca.der
     # Server: 'https://interop.redwax.eu/test/timestamp
     _default_test(
         'https://interop.redwax.eu/test/timestamp',
-        os.path.join('data/redwax-interop-ca.crt'),
+        certificate=os.path.join('data/redwax-interop-ca.crt'),
+        data=b'The RedWax Project',
         hashname='sha256',
     )
+
+
+@pytest.mark.xfail
+def test_redwax_eu_no_certificate():
+    # https://interop.redwax.eu/rs/timestamp/
+    # CA:  https://interop.redwax.eu/test/simple/ca.der
+    # Server: 'https://interop.redwax.eu/test/timestamp
     _default_test(
         'https://interop.redwax.eu/test/timestamp',
+        data=b'The RedWax Project',
         hashname='sha256',
     )
+
 
 def test_freetsa_org():
     _default_test(
