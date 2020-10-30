@@ -1,5 +1,5 @@
 from pyasn1.type import univ, namedtype, tag, namedval, constraint, char, useful
-from pyasn1_modules.rfc2459 import AlgorithmIdentifier, Extensions, MAX
+from pyasn1_modules.rfc2459 import AlgorithmIdentifier, Extensions, MAX, Name
 from pyasn1_modules.rfc2315 import ContentInfo, signedData, SignedData
 from pyasn1.codec.ber import decoder
 
@@ -153,7 +153,7 @@ class GeneralName(univ.Choice):
         namedtype.NamedType('rfc822Name', char.IA5String().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 1))),
         # namedtype.NamedType('dNSName', univ.Any().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 2))),
         # namedtype.NamedType('x400Address', univ.Any().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 3))),
-        namedtype.NamedType('directoryName', univ.Any().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))),
+        namedtype.NamedType('directoryName', Name().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 4))),
         # namedtype.NamedType('ediPartyName', univ.Any().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 5))),
         # namedtype.NamedType('uniformResourceIdentifier', char.IA5String().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 6))),
         # namedtype.NamedType('iPAddress', univ.OctetString().subtype(implicitTag=tag.Tag(tag.tagClassContext, tag.tagFormatSimple, 7))),
