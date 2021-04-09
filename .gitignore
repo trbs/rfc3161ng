@@ -103,3 +103,4 @@ ENV/
 
 # pytest
 .pytest_cache
+/.idea/

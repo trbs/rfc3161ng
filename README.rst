@@ -3,10 +3,10 @@ rfc3161ng
 =========
 
 .. image:: https://img.shields.io/pypi/l/rfc3161ng.svg
-   :target: https://raw.githubusercontent.com/trbs/rfc3161ng/master/LICENSE
+   :target: https://raw.githubusercontent.com/elbosso/rfc3161ng/master/LICENSE
 
 .. image:: https://github.com/trbs/rfc3161ng/workflows/CI/badge.svg?branch=master
-     :target: https://github.com/trbs/rfc3161ng/actions?workflow=CI
+     :target: https://github.com/elbosso/rfc3161ng/actions?workflow=CI
      :alt: CI Status
 
 .. image:: https://img.shields.io/pypi/v/rfc3161ng.svg
@@ -20,11 +20,11 @@ rfc3161ng
 A simple client library for cryptographic timestamping service implementing the
 protocol from RFC3161.
 
-This started as a fork of https://dev.entrouvert.org/projects/python-rfc3161 and
-has some additional patches such as Python3 support.
+This started as a fork of https://github.com/trbs/rfc3161ng and
+has some additional patches.
 
 The latest version of this library is available from
-https://github.com/trbs/rfc3161ng/ .
+https://github.com/elbosso/rfc3161ng/ .
 
 
 Public providers
