@@ -298,8 +298,7 @@ def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_
     message_imprint.setComponentByPosition(0, algorithm_identifier)
     hashobj = hashlib.new(hashname)
     if digest:
-        assert len(digest) == hashobj.digest_size, 'digest length is wrong %s != %s' % (
-        len(digest), hashobj.digest_size)
+        assert len(digest) == hashobj.digest_size, 'digest length is wrong %s != %s' % (len(digest), hashobj.digest_size)
     elif data:
         digest = data_to_digest(data)
     else:
