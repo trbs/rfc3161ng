@@ -55,10 +55,10 @@ Example
 
 Example for a server that insist on SHA256:
 
-    >> import rfc3161ng
-    >> timestamper = rfc3161ng.RemoteTimestamper('https://interop.redwax.eu/test/timestamp', hashname='sha256')
-    >> tsr = timestamper(data=b'The RedWax Project', return_tsr=True)
-    >> print('{}'.format(tsr))
+    >>> import rfc3161ng
+    >>> timestamper = rfc3161ng.RemoteTimestamper('https://interop.redwax.eu/test/timestamp', hashname='sha256')
+    >>> tsr = timestamper(data=b'The RedWax Project', return_tsr=True)
+    >>> print('{}'.format(tsr))
 
 Verifying timestamp using OpenSSL
 =================================
