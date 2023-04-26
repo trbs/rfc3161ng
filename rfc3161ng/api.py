@@ -48,7 +48,9 @@ class TimestampingError(RuntimeError):
 
 
 def generalizedtime_to_utc_datetime(gt, naive=True):
-    m = re.match(r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})(?:(?P<minutes>\d{2})(?:(?P<seconds>\d{2})(?:[.,](?P<fractions>\d*))?)?)?(?P<tz>Z|[+-]\d{2}(?:\d{2})?)?', gt)
+    m = re.match(
+        r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})(?:(?P<minutes>\d{2})(?:(?P<seconds>\d{2})(?:[.,](?P<fractions>\d*))?)?)?(?P<tz>Z|[+-]\d{2}(?:\d{2})?)?',
+        gt)
     if not m:
         raise ValueError("not an ASN.1 generalizedTime: '%s'" % (gt,))
 
@@ -112,6 +114,8 @@ def get_timestamp(tst, naive=True):
 def load_certificate(signed_data, certificate=b""):
     backend = default_backend()
 
+    if certificate is None:
+        certificate = b""
     if certificate == b"":
         try:
             certificate = signed_data['certificates'][0][0]
@@ -125,7 +129,7 @@ def load_certificate(signed_data, certificate=b""):
     return x509.load_der_x509_certificate(certificate, backend)
 
 
-def check_timestamp(tst, certificate=None, data=None, digest=None, hashname=None, nonce=None):
+def check_timestamp(tst, certificate=b"", data=None, digest=None, hashname=None, nonce=None):
     hashname = hashname or 'sha1'
     hashobj = hashlib.new(hashname)
     if digest is None:
@@ -170,7 +174,8 @@ def check_timestamp(tst, certificate=None, data=None, digest=None, hashname=None
         for authenticated_attribute in authenticated_attributes:
             if authenticated_attribute[0] == id_attribute_messageDigest:
                 try:
-                    signed_digest = bytes(decoder.decode(bytes(authenticated_attribute[1][0]), asn1Spec=univ.OctetString())[0])
+                    signed_digest = bytes(
+                        decoder.decode(bytes(authenticated_attribute[1][0]), asn1Spec=univ.OctetString())[0])
                     if signed_digest != content_digest:
                         raise ValueError('Content digest != signed digest')
                     s = univ.SetOf()
@@ -198,9 +203,10 @@ def check_timestamp(tst, certificate=None, data=None, digest=None, hashname=None
 
 
 class RemoteTimestamper(object):
-    def __init__(self, url, certificate=None, capath=None, cafile=None, username=None, password=None, hashname=None, include_tsa_certificate=False, timeout=10, tsa_policy_id=None):
+    def __init__(self, url, certificate=b"", capath=None, cafile=None, username=None, password=None, hashname=None,
+                 include_tsa_certificate=False, timeout=10, tsa_policy_id=None):
         self.url = url
-        self.certificate = certificate
+        self.certificate = certificate or b""
         self.capath = capath
         self.cafile = cafile
         self.username = username
@@ -215,9 +221,7 @@ class RemoteTimestamper(object):
            Check validity of a TimeStampResponse
         '''
         tst = response.time_stamp_token
-        if self.certificate:
-            return self.check(tst, digest=digest, nonce=nonce)
-        return tst
+        return self.check(tst, digest=digest, nonce=nonce)
 
     def check(self, tst, data=None, digest=None, nonce=None):
         return check_timestamp(
@@ -238,7 +242,8 @@ class RemoteTimestamper(object):
             tsa_policy_id=tsa_policy_id,
         )
 
-    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, return_tsr=False, tsa_policy_id=None):
+    def __call__(self, data=None, digest=None, include_tsa_certificate=None, nonce=None, return_tsr=False,
+                 tsa_policy_id=None):
         if data:
             digest = data_to_digest(data, self.hashname)
 
@@ -285,7 +290,8 @@ def data_to_digest(data, hashname='sha1'):
     return hashobj.digest()
 
 
-def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_certificate=False, nonce=None, tsa_policy_id=None):
+def make_timestamp_request(data=None, digest=None, hashname='sha1', include_tsa_certificate=False, nonce=None,
+                           tsa_policy_id=None):
     algorithm_identifier = rfc2459.AlgorithmIdentifier()
     algorithm_identifier.setComponentByPosition(0, get_hash_oid(hashname))
     message_imprint = rfc3161ng.MessageImprint()
